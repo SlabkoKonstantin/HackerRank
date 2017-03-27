@@ -1,0 +1,1 @@
+select count(*) as c from (select count(distinct name) as cnt from city where population > 100000 group by name);
