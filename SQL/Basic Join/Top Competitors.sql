@@ -15,7 +15,7 @@ tablespace USERS
 -- Create table
 create table Difficulty
 (
-  difficult_level number,
+  difficulty_level number,
   score           number
 )
 tablespace USERS
@@ -68,13 +68,13 @@ insert into hackers (hacker_id, name) values (83082,'Michael');
 insert into hackers (hacker_id, name) values (86870,'Todd');
 insert into hackers (hacker_id, name) values (90411,'Joe');
 
-insert into difficulty (difficult_level, score) values (1,20);
-insert into difficulty (difficult_level, score) values (2,30);
-insert into difficulty (difficult_level, score) values (3,40);
-insert into difficulty (difficult_level, score) values (4,60);
-insert into difficulty (difficult_level, score) values (5,80);
-insert into difficulty (difficult_level, score) values (6,100);
-insert into difficulty (difficult_level, score) values (7,120);
+insert into difficulty (difficulty_level, score) values (1,20);
+insert into difficulty (difficulty_level, score) values (2,30);
+insert into difficulty (difficulty_level, score) values (3,40);
+insert into difficulty (difficulty_level, score) values (4,60);
+insert into difficulty (difficulty_level, score) values (5,80);
+insert into difficulty (difficulty_level, score) values (6,100);
+insert into difficulty (difficulty_level, score) values (7,120);
 
 insert into challenges (challenge_id,hacker_id,difficulty_level) values (4810,77726,4);
 insert into challenges (challenge_id,hacker_id,difficulty_level) values (21089,27205,1);
@@ -105,3 +105,30 @@ insert into submissions (submission_id,hacker_id,challenge_id,score) values (841
 insert into submissions (submission_id,hacker_id,challenge_id,score) values (97431,90411,71055,30);
 
 commit;  
+
+with dd as (
+select
+ h.hacker_id
+ ,h.name
+ ,s.submission_id
+-- ,s.hacker_id
+ ,s.challenge_id
+ ,s.score
+ ,c.difficulty_level
+ ,d.score
+from
+  submissions s
+  left join challenges c on s.challenge_id = c.challenge_id
+  inner join difficulty d on d.difficulty_level = c.difficulty_level
+  inner join hackers h on h.hacker_id = s.hacker_id
+where
+  s.score = d.score -- оставляем тех, кто достиг полного счета  
+)
+select 
+  dd.hacker_id, dd.name
+from dd
+  group by dd.hacker_id, dd.name
+having count(*) > 1  
+order by
+  count(*) desc, dd.hacker_id
+;
